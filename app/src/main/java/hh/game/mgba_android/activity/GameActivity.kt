@@ -30,6 +30,7 @@ import hh.game.mgba_android.memory.CoreMemoryBlock
 import hh.game.mgba_android.utils.CheatUtils
 import hh.game.mgba_android.utils.GBAKeys
 import hh.game.mgba_android.utils.Gametype
+import hh.game.mgba_android.utils.ResolutionUtils
 import hh.game.mgba_android.utils.controllerUtil.getDirectionPressed
 import hh.game.mgba_android.utils.controllerUtil.lastDirect
 import hh.game.mgba_android.utils.getKey
@@ -188,6 +189,7 @@ open class GameActivity : AppCompatActivity() {
             .setArguments(
                 gamepath,
                 internalCheatFile,
+                ResolutionUtils.getMultiplier(this).toString(),
 //                fragmentShader
             )
         addGameControler()
@@ -204,13 +206,14 @@ open class GameActivity : AppCompatActivity() {
         // Load xBRZ shader
         // Initialize Tools Button
         findViewById<View>(R.id.tools_btn).setOnClickListener {
-            val options = arrayOf("Shaders", "Memory Tools")
+            val options = arrayOf("Shaders", "Memory Tools", "Resolution")
             AlertDialog.Builder(this)
                 .setTitle("Tools")
                 .setItems(options) { _, which ->
                     when (which) {
                         0 -> showShaderMenu()
                         1 -> openHexEditor()
+                        2 -> showResolutionMenu()
                     }
                 }
                 .show()
@@ -248,6 +251,28 @@ open class GameActivity : AppCompatActivity() {
                     // Toast.makeText(this, "Applied: $selectedName", Toast.LENGTH_SHORT).show()
                 }
             }
+            .show()
+    }
+
+    private fun showResolutionMenu() {
+        val labels = ResolutionUtils.OPTIONS.map { it.first }.toTypedArray()
+        val currentMultiplier = ResolutionUtils.getMultiplier(this)
+        val checkedIndex = ResolutionUtils.OPTIONS.indexOfFirst { it.second == currentMultiplier }
+            .coerceAtLeast(0)
+
+        AlertDialog.Builder(this)
+            .setTitle("Internal Resolution")
+            .setSingleChoiceItems(labels, checkedIndex) { dialog, which ->
+                val selectedMultiplier = ResolutionUtils.OPTIONS[which].second
+                ResolutionUtils.setMultiplier(this, selectedMultiplier)
+                Toast.makeText(
+                    this,
+                    "Resolution set to ${labels[which]}. Restart the game to apply.",
+                    Toast.LENGTH_LONG
+                ).show()
+                dialog.dismiss()
+            }
+            .setNegativeButton("Cancel", null)
             .show()
     }
 

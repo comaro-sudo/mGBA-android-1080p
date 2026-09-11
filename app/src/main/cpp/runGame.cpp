@@ -20,6 +20,7 @@
 
 #include <errno.h>
 #include <signal.h>
+#include <cstdlib>
 
 #include <mgba/core/mem-search.h>
 #include <mgba/core/interface.h>
@@ -128,7 +129,13 @@ int runGame(char** argv){
 
     androidrenderer.core->baseVideoSize(androidrenderer.core, &androidrenderer.width, &androidrenderer.height);
     androidrenderer.ratio = graphicsOpts.multiplier;
-    if (androidrenderer.ratio == 0) {
+    if (argv[3]) {
+        float requestedRatio = atof(argv[3]);
+        if (requestedRatio > 0) {
+            androidrenderer.ratio = requestedRatio;
+        }
+    }
+    if (androidrenderer.ratio <= 0) {
         androidrenderer.ratio = 1;
     }
     opts.width = androidrenderer.width * androidrenderer.ratio;
@@ -139,10 +146,10 @@ int runGame(char** argv){
     struct mCheatDevice* device = androidrenderer.core->cheatDevice(androidrenderer.core);
     if(argv[2])
     args.cheatsFile = argv[2];
-//    if(argv[3])
-//        _fragmentShader = argv[3];
 //    if(argv[4])
-//        _vertexShader = argv[4];
+//        _fragmentShader = argv[4];
+//    if(argv[5])
+//        _vertexShader = argv[5];
     mInputMapInit(&androidrenderer.core->inputMap, &GBAInputInfo);
     mCoreInitConfig(androidrenderer.core, PORT);
     

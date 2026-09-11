@@ -51,7 +51,7 @@ struct mSDLRenderer {
 	unsigned height;
 	int viewportWidth;
 	int viewportHeight;
-	int ratio;
+	float ratio;
 
 	bool lockAspectRatio;
 	bool lockIntegerScaling;
